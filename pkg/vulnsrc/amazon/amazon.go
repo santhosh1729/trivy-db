@@ -3,12 +3,11 @@ package amazon
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/aquasecurity/trivy-db/pkg/types"
 	"io"
 	"log"
 	"path/filepath"
 	"strings"
-
-	"github.com/aquasecurity/trivy-db/pkg/types"
 
 	bolt "go.etcd.io/bbolt"
 	"golang.org/x/xerrors"
@@ -105,6 +104,31 @@ func (vs VulnSrc) commitFunc(tx *bolt.Tx) error {
 				advisory := types.Advisory{
 					FixedVersion: constructVersion(pkg.Epoch, pkg.Version, pkg.Release),
 				}
+				existingAdvisory, err := vs.dbc.GetAdvisoryDetail(tx,cveID, platformName, pkg.Name)
+
+				if err != nil {
+					return xerrors.Errorf("failed to get Amazon advisory: %w", err)
+				}
+				if existingAdvisory.AdvisoryItem != nil{
+					existingAdvisoryDetails := existingAdvisory.AdvisoryItem.(types.Advisory)
+
+					if len(existingAdvisoryDetails.Advisories) > 0 {
+						advisory.Advisories = existingAdvisoryDetails.Advisories
+					}
+				}
+
+				if !utils.StringInSlice(alas.ID,advisory.Advisories){
+					advisory.Advisories = append(advisory.Advisories,alas.ID)
+				}
+
+				//publishedDate, _ := time.Parse("2015-08-17 12:31", alas.Issued.Date)
+				//advisory.Advisories[alas.ID] = types.SecurityAdvisory{
+				//	Id:            alas.ID,
+				//	Severity:      alas.Severity,
+				//	PublishedDate: &publishedDate,
+				//	Description:   alas.Description,
+				//}
+
 				if err := vs.dbc.PutAdvisoryDetail(tx, cveID, platformName, pkg.Name, advisory); err != nil {
 					return xerrors.Errorf("failed to save Amazon advisory: %w", err)
 				}

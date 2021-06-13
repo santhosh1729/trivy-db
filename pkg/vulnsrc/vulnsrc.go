@@ -170,17 +170,17 @@ func (o fullOptimizer) Optimize() error {
 		return xerrors.Errorf("failed to iterate severity: %w", err)
 	}
 
-	if err := o.dbc.DeleteSeverityBucket(); err != nil {
-		return xerrors.Errorf("failed to delete severity bucket: %w", err)
-	}
-
-	if err := o.dbc.DeleteVulnerabilityDetailBucket(); err != nil {
-		return xerrors.Errorf("failed to delete vulnerability detail bucket: %w", err)
-	}
-
-	if err := o.dbc.DeleteAdvisoryDetailBucket(); err != nil {
-		return xerrors.Errorf("failed to delete advisory detail bucket: %w", err)
-	}
+	//if err := o.dbc.DeleteSeverityBucket(); err != nil {
+	//	return xerrors.Errorf("failed to delete severity bucket: %w", err)
+	//}
+	//
+	//if err := o.dbc.DeleteVulnerabilityDetailBucket(); err != nil {
+	//	return xerrors.Errorf("failed to delete vulnerability detail bucket: %w", err)
+	//}
+	//
+	//if err := o.dbc.DeleteAdvisoryDetailBucket(); err != nil {
+	//	return xerrors.Errorf("failed to delete advisory detail bucket: %w", err)
+	//}
 
 	return nil
 

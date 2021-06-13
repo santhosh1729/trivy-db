@@ -111,11 +111,18 @@ type Advisory struct {
 
 	// for library
 	// Some advisories provide VulnerableVersions only, others provide PatchedVersions and UnaffectedVersions
-	VulnerableVersions []string `json:",omitempty"`
-	PatchedVersions    []string `json:",omitempty"`
-	UnaffectedVersions []string `json:",omitempty"`
+	VulnerableVersions []string                    `json:",omitempty"`
+	PatchedVersions    []string                    `json:",omitempty"`
+	UnaffectedVersions []string                    `json:",omitempty"`
+	Advisories         []string `json:",omitempty"`
 }
 
+type SecurityAdvisory struct {
+	Id            string     `json:"Id,omitempty"`
+	Severity      string     `json:"Severity,omitempty"`
+	PublishedDate *time.Time `json:",omitempty"`
+	Description   string     `json:"description"`
+}
 type Vulnerability struct {
 	Title            string         `json:",omitempty"`
 	Description      string         `json:",omitempty"`
