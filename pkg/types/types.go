@@ -127,6 +127,7 @@ type Vulnerability struct {
 	References       []string       `json:",omitempty"`
 	PublishedDate    *time.Time     `json:",omitempty"`
 	LastModifiedDate *time.Time     `json:",omitempty"`
+	CustomData       interface{}    `json:",omitempty"`
 }
 
 type VulnSrc interface {
