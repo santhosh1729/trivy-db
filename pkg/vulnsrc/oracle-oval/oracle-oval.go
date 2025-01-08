@@ -151,7 +151,11 @@ func (vs *VulnSrc) commit(tx *bolt.Tx, ovals []OracleOVAL) error {
 				Entries: []types.Advisory{
 					{
 						FixedVersion: affectedPkg.FixedVersion,
+<<<<<<< Updated upstream
 						Arches:       []string{affectedPkg.Arch},
+=======
+						VendorIDs:    []string{elsaID},
+>>>>>>> Stashed changes
 					},
 				},
 			}
@@ -211,6 +215,7 @@ func (vs *VulnSrc) commit(tx *bolt.Tx, ovals []OracleOVAL) error {
 	return nil
 }
 
+<<<<<<< Updated upstream
 type archFlavor struct {
 	Arch   string
 	Flavor PkgFlavor
@@ -238,6 +243,22 @@ func mergeAdvisoriesEntries(advisories types.Advisories) types.Advisories {
 		return types.Advisory{
 			FixedVersion: ver,
 			Arches:       arches,
+=======
+// resolveAdvisoriesEntries removes entries with the same fixedVersion.
+// Additionally, it only selects the latest fixedVersion for each flavor.
+func resolveAdvisoriesEntries(advisories types.Advisories) types.Advisories {
+	fixedVersionsAdv := lo.Map(advisories.Entries, func(entry types.Advisory, _ int) types.Advisory {
+		return types.Advisory{
+			FixedVersion: entry.FixedVersion,
+			VendorIDs:    entry.VendorIDs,
+		}
+	})
+	fixedVer, resolvedVers := resolveVersions(fixedVersionsAdv)
+	entries := lo.Map(resolvedVers, func(adv types.Advisory, _ int) types.Advisory {
+		return types.Advisory{
+			FixedVersion: adv.FixedVersion,
+			VendorIDs:    adv.VendorIDs,
+>>>>>>> Stashed changes
 		}
 	})
 	sort.Slice(entries, func(i, j int) bool {
@@ -250,6 +271,7 @@ func mergeAdvisoriesEntries(advisories types.Advisories) types.Advisories {
 	}
 }
 
+<<<<<<< Updated upstream
 // selectLatestVersions selects the latest (highest) version per (arch, flavor)
 func selectLatestVersions(advisories types.Advisories) map[archFlavor]string {
 	latestVersions := make(map[archFlavor]string) // key: archFlavor -> highest fixedVersion
@@ -269,10 +291,52 @@ func selectLatestVersions(advisories types.Advisories) map[archFlavor]string {
 			// Keep the higher (latest) version
 			latestVersions[key] = entry.FixedVersion
 		}
+=======
+// resolveVersions removes duplicates and returns normal flavor + only one version for each flavor.
+func resolveVersions(vers []types.Advisory) (string, []types.Advisory) {
+	// Ensure unique entries by FixedVersion
+	fixedVers := make(map[PkgFlavor]types.Advisory)
+
+	for _, entry := range vers {
+		flavor := PackageFlavor(entry.FixedVersion) // Assuming PackageFlavor determines the flavor from version string
+		if savedEntry, ok := fixedVers[flavor]; ok {
+			v := version.NewVersion(entry.FixedVersion)
+			sv := version.NewVersion(savedEntry.FixedVersion)
+			if v.LessThan(sv) {
+				entry = savedEntry
+			}
+		}
+		fixedVers[flavor] = entry
+	}
+
+	// Collect and sort resolved versions
+	resolvedEntries := lo.Values(fixedVers)
+	slices.SortFunc(resolvedEntries, func(a, b types.Advisory) int {
+		vA := version.NewVersion(a.FixedVersion)
+		vB := version.NewVersion(b.FixedVersion)
+		if vA.LessThan(vB) {
+			return -1
+		} else if vA.GreaterThan(vB) {
+			return 1
+		}
+		return 0
+	})
+
+	// Ensure at least one entry before accessing index 0
+	if len(resolvedEntries) == 0 {
+		return "", []types.Advisory{}
+	}
+
+	// Determine the fixed version (default to normal flavor or the lowest version)
+	fixedVersion, ok := fixedVers[NormalPackageFlavor]
+	if !ok {
+		fixedVersion = resolvedEntries[0]
+>>>>>>> Stashed changes
 	}
 	return latestVersions
 }
 
+<<<<<<< Updated upstream
 // determinePrimaryFixedVersion determines primary fixed version for backward compatibility
 // It is chosen as the highest normal flavor version on x86_64 if any exist.
 // If no normal flavor version exists, the maximum version in lexical order is chosen.
@@ -285,6 +349,9 @@ func determinePrimaryFixedVersion(latestVersions map[archFlavor]string) string {
 		primaryFixedVersion = lo.Max(lo.Values(latestVersions)) // Chose the maximum value in lexical order for idempotency
 	}
 	return primaryFixedVersion
+=======
+	return fixedVersion.FixedVersion, resolvedEntries
+>>>>>>> Stashed changes
 }
 
 type PkgFlavor string
