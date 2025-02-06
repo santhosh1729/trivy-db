@@ -46,14 +46,14 @@ var (
 type VulnSrc struct {
 	dist   Distribution
 	dbc    db.Operation
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 func NewVulnSrc(dist Distribution) VulnSrc {
 	return VulnSrc{
 		dist:   dist,
 		dbc:    db.Config{},
-		logger: log.WithPrefix("suse-cvrf"),
+		Logger: log.WithPrefix("suse-cvrf"),
 	}
 }
 
@@ -68,7 +68,7 @@ func (vs VulnSrc) Name() types.SourceID {
 }
 
 func (vs VulnSrc) Update(dir string) error {
-	vs.logger.Info("Saving SUSE CVRF")
+	vs.Logger.Info("Saving SUSE CVRF")
 	rootDir := filepath.Join(dir, "vuln-list", suseDir)
 	eb := oops.In("suse").Tags("cvrf").With("root_dir", rootDir)
 
@@ -177,7 +177,7 @@ func (vs VulnSrc) getAffectedPackages(relationships []Relationship) []AffectedPa
 
 		pkg := getPackage(relationship.ProductReference)
 		if pkg == nil {
-			vs.logger.Warn("Invalid package name", log.String("reference", relationship.ProductReference))
+			vs.Logger.Warn("Invalid package name", log.String("reference", relationship.ProductReference))
 			continue
 		}
 
@@ -203,11 +203,11 @@ func (vs VulnSrc) getOSVersion(platformName string) string {
 		// openSUSE Leap 15.0
 		ss := strings.Split(platformName, " ")
 		if len(ss) < 3 {
-			vs.logger.Warn("Invalid version", log.String("platform", platformName))
+			vs.Logger.Warn("Invalid version", log.String("platform", platformName))
 			return ""
 		}
 		if _, err := version.Parse(ss[2]); err != nil {
-			vs.logger.Warn("Invalid version",
+			vs.Logger.Warn("Invalid version",
 				log.String("platform", platformName),
 				log.Err(err))
 			return ""
@@ -218,11 +218,11 @@ func (vs VulnSrc) getOSVersion(platformName string) string {
 		// SUSE Linux Enterprise Micro 5.3
 		ss := strings.Split(platformName, " ")
 		if len(ss) < 5 {
-			vs.logger.Warn("Invalid version", log.String("platform", platformName))
+			vs.Logger.Warn("Invalid version", log.String("platform", platformName))
 			return ""
 		}
 		if _, err := version.Parse(ss[4]); err != nil {
-			vs.logger.Warn("Invalid version",
+			vs.Logger.Warn("Invalid version",
 				log.String("platform", platformName),
 				log.Err(err))
 			return ""
@@ -249,7 +249,7 @@ func (vs VulnSrc) getOSVersion(platformName string) string {
 		}
 		switch len(versions) {
 		case 0:
-			vs.logger.Warn("Failed to detect version", log.String("platform", platformName))
+			vs.Logger.Warn("Failed to detect version", log.String("platform", platformName))
 			return ""
 		case 1:
 			return fmt.Sprintf(platformSUSELinuxFormat, versions[0])

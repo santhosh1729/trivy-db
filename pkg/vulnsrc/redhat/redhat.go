@@ -29,13 +29,13 @@ const (
 
 type VulnSrc struct {
 	dbc    db.Operation
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 func NewVulnSrc() VulnSrc {
 	return VulnSrc{
 		dbc:    db.Config{},
-		logger: log.WithPrefix("redhat"),
+		Logger: log.WithPrefix("redhat"),
 	}
 }
 
@@ -111,7 +111,7 @@ func (vs VulnSrc) Update(dir string) error {
 }
 
 func (vs VulnSrc) save(cves []RedhatCVE) error {
-	vs.logger.Info("Saving DB")
+	vs.Logger.Info("Saving DB")
 	err := vs.dbc.BatchUpdate(func(tx *bolt.Tx) error {
 		return vs.commit(tx, cves)
 	})

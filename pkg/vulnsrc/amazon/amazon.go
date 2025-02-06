@@ -35,7 +35,7 @@ var (
 
 type VulnSrc struct {
 	dbc        db.Operation
-	logger     *log.Logger
+	Logger     *log.Logger
 	advisories map[string][]ALAS
 }
 
@@ -67,7 +67,7 @@ type Reference struct {
 func NewVulnSrc() VulnSrc {
 	return VulnSrc{
 		dbc:        db.Config{},
-		logger:     log.WithPrefix("amazon"),
+		Logger:     log.WithPrefix("amazon"),
 		advisories: map[string][]ALAS{},
 	}
 }
@@ -99,7 +99,7 @@ func (vs *VulnSrc) walkFunc(r io.Reader, path string) error {
 	}
 	version := paths[len(paths)-2]
 	if !slices.Contains(targetVersions, version) {
-		vs.logger.Warn("Unsupported Amazon version", "version", version)
+		vs.Logger.Warn("Unsupported Amazon version", "version", version)
 		return nil
 	}
 
@@ -113,7 +113,7 @@ func (vs *VulnSrc) walkFunc(r io.Reader, path string) error {
 }
 
 func (vs VulnSrc) save() error {
-	vs.logger.Info("Saving DB")
+	vs.Logger.Info("Saving DB")
 	err := vs.dbc.BatchUpdate(func(tx *bolt.Tx) error {
 		return vs.commit(tx)
 	})

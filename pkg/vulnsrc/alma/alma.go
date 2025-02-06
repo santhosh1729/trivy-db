@@ -48,7 +48,7 @@ type DB interface {
 
 type VulnSrc struct {
 	DB     // Those who want to customize Trivy DB can override put/get methods.
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 // Alma implements the DB interface
@@ -59,7 +59,7 @@ type Alma struct {
 func NewVulnSrc() *VulnSrc {
 	return &VulnSrc{
 		DB:     &Alma{Operation: db.Config{}},
-		logger: log.WithPrefix("alma"),
+		Logger: log.WithPrefix("alma"),
 	}
 }
 
@@ -95,7 +95,7 @@ func (vs *VulnSrc) parse(rootDir string) (map[string][]Erratum, error) {
 
 		dirs := strings.Split(path, string(filepath.Separator))
 		if len(dirs) < 3 {
-			vs.logger.Warn("Invalid path", log.FilePath(path))
+			vs.Logger.Warn("Invalid path", log.FilePath(path))
 			return nil
 		}
 

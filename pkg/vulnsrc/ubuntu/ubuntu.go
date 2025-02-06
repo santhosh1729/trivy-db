@@ -75,14 +75,14 @@ func WithCustomPut(put db.CustomPut) Option {
 type VulnSrc struct {
 	put    db.CustomPut
 	dbc    db.Operation
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 func NewVulnSrc(opts ...Option) VulnSrc {
 	src := VulnSrc{
 		put:    defaultPut,
 		dbc:    db.Config{},
-		logger: log.WithPrefix("ubuntu"),
+		Logger: log.WithPrefix("ubuntu"),
 	}
 
 	for _, o := range opts {
@@ -120,7 +120,7 @@ func (vs VulnSrc) Update(dir string) error {
 }
 
 func (vs VulnSrc) save(cves []UbuntuCVE) error {
-	vs.logger.Info("Saving DB")
+	vs.Logger.Info("Saving DB")
 	err := vs.dbc.BatchUpdate(func(tx *bolt.Tx) error {
 		err := vs.commit(tx, cves)
 		if err != nil {

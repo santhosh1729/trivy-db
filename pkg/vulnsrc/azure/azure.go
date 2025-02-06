@@ -53,7 +53,7 @@ type resolvedTest struct {
 
 type VulnSrc struct {
 	dbc            db.Operation
-	logger         *log.Logger
+	Logger         *log.Logger
 	azureDir       string
 	source         types.DataSource
 	platformFormat string
@@ -70,7 +70,7 @@ func NewVulnSrc(dist Distribution) VulnSrc {
 func azureVulnSrc() VulnSrc {
 	return VulnSrc{
 		dbc:            db.Config{},
-		logger:         log.WithPrefix("azure"),
+		Logger:         log.WithPrefix("azure"),
 		azureDir:       azureDir,
 		source:         azureSource,
 		platformFormat: azurePlatformFormat,
@@ -80,7 +80,7 @@ func azureVulnSrc() VulnSrc {
 func marinerVulnSrc() VulnSrc {
 	return VulnSrc{
 		dbc:            db.Config{},
-		logger:         log.WithPrefix("mariner"),
+		Logger:         log.WithPrefix("mariner"),
 		azureDir:       marinerDir,
 		source:         marinerSource,
 		platformFormat: marinerPlatformFormat,
@@ -118,7 +118,7 @@ func (vs VulnSrc) Update(dir string) error {
 }
 
 func (vs VulnSrc) parseOVAL(dir string) ([]Entry, error) {
-	vs.logger.Info("Parsing OVAL", log.DirPath(dir))
+	vs.Logger.Info("Parsing OVAL", log.DirPath(dir))
 
 	// Parse and resolve tests
 	tests, err := resolveTests(dir)

@@ -43,13 +43,13 @@ var (
 
 type VulnSrc struct {
 	dbc    db.Operation
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 func NewVulnSrc() VulnSrc {
 	return VulnSrc{
 		dbc:    db.Config{},
-		logger: log.WithPrefix("redhat-oval"),
+		Logger: log.WithPrefix("redhat-oval"),
 	}
 }
 
@@ -307,7 +307,7 @@ func (vs VulnSrc) Get(pkgName string, repositories, nvrs []string) ([]types.Advi
 }
 
 func (vs VulnSrc) parseOVALStream(dir string, uniqCPEs CPEMap) (map[bucket]Definition, error) {
-	vs.logger.Info("Parsing OVAL stream", log.DirPath(dir))
+	vs.Logger.Info("Parsing OVAL stream", log.DirPath(dir))
 
 	// Parse tests
 	tests, err := parseTests(dir)

@@ -33,7 +33,7 @@ type DB interface {
 
 type VulnSrc struct {
 	DB
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 type NVD struct {
@@ -43,7 +43,7 @@ type NVD struct {
 func NewVulnSrc() *VulnSrc {
 	return &VulnSrc{
 		DB:     &NVD{Operation: db.Config{}},
-		logger: log.WithPrefix("nvd"),
+		Logger: log.WithPrefix("nvd"),
 	}
 }
 
@@ -91,7 +91,7 @@ func (vs *VulnSrc) commit(tx *bolt.Tx, cves []Cve) error {
 }
 
 func (vs *VulnSrc) save(cves []Cve) error {
-	vs.logger.Info("NVD batch update")
+	vs.Logger.Info("NVD batch update")
 	err := vs.BatchUpdate(func(tx *bolt.Tx) error {
 		return vs.commit(tx, cves)
 	})

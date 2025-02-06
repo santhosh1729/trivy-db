@@ -65,7 +65,7 @@ func WithCustomPut(put db.CustomPut) Option {
 type VulnSrc struct {
 	put    db.CustomPut
 	dbc    db.Operation
-	logger *log.Logger
+	Logger *log.Logger
 
 	// Hold a map of codenames and major versions from distributions.json
 	// e.g. "buster" => "10"
@@ -97,7 +97,7 @@ func NewVulnSrc(opts ...Option) VulnSrc {
 	src := VulnSrc{
 		put:              defaultPut,
 		dbc:              db.Config{},
-		logger:           log.WithPrefix("debian"),
+		Logger:           log.WithPrefix("debian"),
 		distributions:    map[string]string{},
 		details:          map[string]VulnerabilityDetail{},
 		pkgVersions:      map[bucket]string{},
@@ -189,7 +189,7 @@ func (vs VulnSrc) parseBug(dir string, fn func(bug) error) error {
 }
 
 func (vs VulnSrc) parseCVE(dir string) error {
-	vs.logger.Info("Parsing CVE JSON files...")
+	vs.Logger.Info("Parsing CVE JSON files...")
 	err := vs.parseBug(filepath.Join(dir, cveDir), func(bug bug) error {
 		// Hold severities per the packages
 		severities := map[string]string{}
@@ -267,7 +267,7 @@ func (vs VulnSrc) parseCVE(dir string) error {
 }
 
 func (vs VulnSrc) parseDLA(dir string) error {
-	vs.logger.Info("Parsing DLA JSON files...")
+	vs.Logger.Info("Parsing DLA JSON files...")
 	if err := vs.parseAdvisory(filepath.Join(dir, dlaDir)); err != nil {
 		return oops.Wrapf(err, "DLA parse error")
 	}
@@ -275,7 +275,7 @@ func (vs VulnSrc) parseDLA(dir string) error {
 }
 
 func (vs VulnSrc) parseDSA(dir string) error {
-	vs.logger.Info("Parsing DSA JSON files...")
+	vs.Logger.Info("Parsing DSA JSON files...")
 	if err := vs.parseAdvisory(filepath.Join(dir, dsaDir)); err != nil {
 		return oops.Wrapf(err, "DSA parse error")
 	}
@@ -353,14 +353,14 @@ func (vs VulnSrc) parseAdvisory(dir string) error {
 }
 
 func (vs VulnSrc) save() error {
-	vs.logger.Info("Saving DB")
+	vs.Logger.Info("Saving DB")
 	err := vs.dbc.BatchUpdate(func(tx *bolt.Tx) error {
 		return vs.commit(tx)
 	})
 	if err != nil {
 		return oops.Wrapf(err, "batch update error")
 	}
-	vs.logger.Info("Saved DB")
+	vs.Logger.Info("Saved DB")
 	return nil
 }
 
@@ -537,7 +537,7 @@ func severityFromUrgency(urgency string) types.Severity {
 }
 
 func (vs VulnSrc) parseDistributions(rootDir string) error {
-	vs.logger.Info("Parsing distributions...")
+	vs.Logger.Info("Parsing distributions...")
 	filePath := filepath.Join(rootDir, distributionsFile)
 	eb := oops.With("root_dir", rootDir).With("file_path", filePath)
 
@@ -574,7 +574,7 @@ func (vs VulnSrc) parseSources(dir string) error {
 		}
 		eb = eb.With("code_name", code)
 
-		vs.logger.Info("Parsing sources...", log.String("code", code))
+		vs.Logger.Info("Parsing sources...", log.String("code", code))
 		err := utils.FileWalk(codePath, func(r io.Reader, path string) error {
 			eb := eb.With("file_path", path)
 

@@ -58,7 +58,7 @@ type DB interface {
 
 type VulnSrc struct {
 	DB
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 type Rocky struct {
@@ -68,7 +68,7 @@ type Rocky struct {
 func NewVulnSrc() *VulnSrc {
 	return &VulnSrc{
 		DB:     &Rocky{Operation: db.Config{}},
-		logger: log.WithPrefix("rocky"),
+		Logger: log.WithPrefix("rocky"),
 	}
 }
 
@@ -105,7 +105,7 @@ func (vs *VulnSrc) parse(rootDir string) (map[string][]RLSA, error) {
 
 		dirs := strings.Split(strings.TrimPrefix(path, rootDir), string(filepath.Separator))[1:]
 		if len(dirs) != 5 {
-			vs.logger.Warn("Invalid path", log.FilePath(path))
+			vs.Logger.Warn("Invalid path", log.FilePath(path))
 			return nil
 		}
 
@@ -116,12 +116,12 @@ func (vs *VulnSrc) parse(rootDir string) (map[string][]RLSA, error) {
 		}
 		repo, arch := dirs[1], dirs[2]
 		if !slices.Contains(targetRepos, repo) {
-			vs.logger.Warn("Unsupported Rocky repo", log.String("repo", repo))
+			vs.Logger.Warn("Unsupported Rocky repo", log.String("repo", repo))
 			return nil
 		}
 
 		if !slices.Contains(targetArches, arch) {
-			vs.logger.Warn("Unsupported Rocky arch", log.String("arch", arch))
+			vs.Logger.Warn("Unsupported Rocky arch", log.String("arch", arch))
 			return nil
 		}
 

@@ -50,13 +50,13 @@ type packageType string
 
 type VulnSrc struct {
 	dbc    db.Operation
-	logger *log.Logger
+	Logger *log.Logger
 }
 
 func NewVulnSrc() VulnSrc {
 	return VulnSrc{
 		dbc:    db.Config{},
-		logger: log.WithPrefix("glad"),
+		Logger: log.WithPrefix("glad"),
 	}
 }
 
@@ -67,7 +67,7 @@ func (vs VulnSrc) Name() types.SourceID {
 func (vs VulnSrc) Update(dir string) error {
 	eb := oops.In("glad")
 	for t := range ecosystems {
-		vs.logger.Info("Updating GitLab Advisory Database",
+		vs.Logger.Info("Updating GitLab Advisory Database",
 			log.String("type", cases.Title(language.English).String(string(t))))
 
 		rootDir := filepath.Join(dir, "vuln-list", gladDir, string(t))
